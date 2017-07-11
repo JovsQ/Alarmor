@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -34,6 +35,15 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         if(extras != null && extras.getBoolean(ONE_TIME, Boolean.FALSE)){
             msgStr.append("One time Timer : ");
+        }
+        Log.d("alarmor", "has intent: " + intent.hasExtra(ONE_TIME));
+
+        if (intent.hasExtra(ONE_TIME) && intent.getBooleanExtra(ONE_TIME, false)) {
+            Calendar now = Calendar.getInstance();
+            Log.d("alarmor", "Calendar: " + now.getTime());
+            now.set(Calendar.MINUTE, now.get(Calendar.MINUTE) + 1);
+            Log.d("alarmor", "Calendar: " + now.getTime());
+            setOnetimeTimer(context, now, false);
         }
         Format formatter = new SimpleDateFormat("hh:mm:ss a");
         msgStr.append(formatter.format(new Date()));
@@ -67,11 +77,12 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
     }
-    public void setOnetimeTimer(Context context){
+    public void setOnetimeTimer(Context context, Calendar calendar, boolean start){
+        Log.d("alarmor", "BR set one time alarm");
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
-        intent.putExtra(ONE_TIME, Boolean.TRUE);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, 0);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pi);
+        intent.putExtra(ONE_TIME, start);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        am.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pi);
     }
 }

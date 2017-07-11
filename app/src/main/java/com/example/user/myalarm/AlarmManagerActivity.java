@@ -11,6 +11,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 /**
  * Created by USER on 7/11/2017.
  */
@@ -70,7 +72,11 @@ public class AlarmManagerActivity extends AppCompatActivity {
     public void onetimeTimer(View view){
         Context context = this.getApplicationContext();
         if(alarm != null){
-            alarm.setOnetimeTimer(context);
+            Calendar now = Calendar.getInstance();
+            Log.d("alarmor", "Calendar: " + now.getTime());
+            now.set(Calendar.MINUTE, now.get(Calendar.MINUTE) + 1);
+            Log.d("alarmor", "Calendar: " + now.getTime());
+            alarm.setOnetimeTimer(context, now, true);
         }else{
             Toast.makeText(context, "Alarm is null", Toast.LENGTH_SHORT).show();
         }
