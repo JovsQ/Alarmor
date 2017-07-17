@@ -1,8 +1,12 @@
 package com.example.user.myalarm;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -10,6 +14,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import com.example.user.myalarm.services.OnScreenOffReceiver;
 
 import java.util.Calendar;
 
@@ -19,26 +25,48 @@ import java.util.Calendar;
 
 public class AlarmManagerActivity extends AppCompatActivity {
     private AlarmManagerBroadcastReceiver alarm;
+
+    private PowerManager.WakeLock wakeLock;
+    private OnScreenOffReceiver onScreenOffReceiver;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
         setContentView(R.layout.activity_alarm_manager);
         alarm = new AlarmManagerBroadcastReceiver();
-
-        checkCurfew();
-
+//        checkCurfew();
     }
 
-    private void checkCurfew() {
-        if (getIntent().hasExtra("CURFEW")) {
-            final Window win = getWindow();
-            win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                    WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        Log.d("alarmor", "has focus: " + hasFocus);
+        if (!hasFocus) {
+//            sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+
+//            sendBroadcast(new Intent(Intent.ACTION_LOCKED_BOOT_COMPLETED));
+
+//            startActivity(new Intent(this, AlarmManagerActivity.class)
+//                    .putExtra("CURFEW", true)
+//                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         }
     }
+
+//    private void checkCurfew() {
+//        if (getIntent().hasExtra("CURFEW")) {
+//            final Window win = getWindow();
+//            win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+//                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+//                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+//                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+//                    WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+//        }
+//    }
 
     @Override
     protected void onStart() {

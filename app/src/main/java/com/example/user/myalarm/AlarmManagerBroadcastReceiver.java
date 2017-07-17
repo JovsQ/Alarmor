@@ -1,6 +1,7 @@
 package com.example.user.myalarm;
 
 import android.app.AlarmManager;
+import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,6 +15,8 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import static android.content.Context.KEYGUARD_SERVICE;
 
 /**
  * Created by USER on 7/11/2017.
@@ -37,7 +40,6 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
             msgStr.append("One time Timer : ");
         }
         Log.d("alarmor", "has intent: " + intent.hasExtra(ONE_TIME));
-
         if (intent.hasExtra(ONE_TIME) && intent.getBooleanExtra(ONE_TIME, false)) {
             Calendar now = Calendar.getInstance();
             Log.d("alarmor", "Calendar: " + now.getTime());
@@ -52,6 +54,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
 
         context.startActivity(new Intent(context, AlarmManagerActivity.class)
                 .putExtra("CURFEW", true)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
         //Release the lock
@@ -77,8 +80,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(sender);
     }
+
     public void setOnetimeTimer(Context context, Calendar calendar, boolean start){
-        Log.d("alarmor", "BR set one time alarm");
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         intent.putExtra(ONE_TIME, start);
