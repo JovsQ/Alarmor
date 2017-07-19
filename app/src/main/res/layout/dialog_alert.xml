@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical|center_horizontal">
+
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="165dp"
+            android:id="@+id/imageView"
+            android:alpha="1"
+            android:minWidth="20dp"
+            android:layout_centerInParent="true"
+            android:scaleType="fitXY"
+            android:background="@android:color/white"/>
+
+        <TextView
+            android:text="Close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/colorPrimary"
+            android:id="@+id/alert_title"
+            android:singleLine="false"
+            android:textStyle="bold"
+            android:layout_below="@+id/alert_icon"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp" />
+
+        <ImageButton
+            android:id="@+id/alert_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_alignLeft="@+id/imageView"
+            android:layout_alignStart="@+id/imageView"
+            android:layout_alignRight="@+id/imageView"
+            android:layout_alignEnd="@+id/imageView"
+            android:padding="0dp"
+            android:clickable="true"
+            android:focusableInTouchMode="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Confirm"
+            android:id="@+id/alert_confirm_text"
+            android:layout_alignBottom="@+id/imageView"
+            android:layout_alignLeft="@+id/imageView"
+            android:layout_alignStart="@+id/imageView"
+            android:layout_alignRight="@+id/imageView"
+            android:layout_alignEnd="@+id/imageView"
+            android:gravity="center_vertical|center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_alignTop="@+id/alert_confirm" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alert Message Here"
+            android:id="@+id/alert_message"
+            android:gravity="center_vertical|center_horizontal"
+            android:enabled="false"
+            android:onClick="onOkClicked"
+            android:layout_below="@+id/alert_title"
+            android:layout_alignRight="@+id/imageView"
+            android:layout_alignEnd="@+id/imageView"
+            android:layout_alignLeft="@+id/imageView"
+            android:layout_alignStart="@+id/imageView"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="10dp" />
+
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:id="@+id/alert_icon"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="false" />
+
+
+</RelativeLayout>
