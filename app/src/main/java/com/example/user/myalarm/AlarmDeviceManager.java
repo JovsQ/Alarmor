@@ -1,13 +1,12 @@
 package com.example.user.myalarm;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.example.user.myalarm.receiver.AlarmDeviceAdminReceiver;
 
@@ -52,21 +51,24 @@ public class AlarmDeviceManager {
 
     public void lockScreen(String pw){
         doResetPassword(pw);
-        aDevicePolicyManager.lockNow();
+
+//  aDevicePolicyManager.lockNow();
     }
 
 
+    private KeyguardManager keyguardManager;
 
-//    public void lockScreen(String password){
+
+    public void lockKeyguard(String password){
 //        aDevicePolicyManager.setPasswordMinimumLength(aDeviceAdmin, 0);
 //        aDevicePolicyManager.lockNow();
-//        KeyguardManager keyguardManager = (KeyguardManager) context.getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
-//        KeyguardManager.KeyguardLock keyguardLock = null;
-//        keyguardLock = keyguardManager.newKeyguardLock(password);
-//        doResetPassword(password);
-//        keyguardLock.reenableKeyguard();
-//
-//    }
+        keyguardManager = (KeyguardManager) context.getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
+        KeyguardManager.KeyguardLock keyguardLock = null;
+        keyguardLock = keyguardManager.newKeyguardLock(password);
+        doResetPassword(password);
+        keyguardLock.reenableKeyguard();
+
+    }
 
     public void unlockScreen(String password) {
         if (isScreenLocked()) {

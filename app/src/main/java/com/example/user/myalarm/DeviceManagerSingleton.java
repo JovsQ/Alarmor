@@ -9,8 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 
 public class DeviceManagerSingleton {
 
+    public static final String LOCK_DEVICE = "lock_device";
+
     private AlarmDeviceManager alarmDeviceManager;
-    private Context context;
+    private boolean enabled;
 
     private static DeviceManagerSingleton DEVICE_MANAGER = new DeviceManagerSingleton();
 
@@ -28,13 +30,13 @@ public class DeviceManagerSingleton {
         return alarmDeviceManager;
     }
 
-    public void lockScreen(final String password) {
+    public void lockScreen(final Context context, final String password) {
         if (alarmDeviceManager != null) {
             alarmDeviceManager.lockScreen(password);
         }
     }
 
-    public void unLockScreen(final String password) {
+    public void unLockScreen(final Context context, final String password) {
         if (alarmDeviceManager !=null) {
             alarmDeviceManager.unlockScreen(password);
         }

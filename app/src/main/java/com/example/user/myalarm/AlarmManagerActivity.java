@@ -14,7 +14,9 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -28,6 +30,8 @@ import android.widget.Toast;
 import com.example.user.myalarm.services.OnScreenOffReceiver;
 
 import java.util.Calendar;
+
+import static com.example.user.myalarm.DeviceManagerSingleton.LOCK_DEVICE;
 
 /**
  * Created by USER on 7/11/2017.
@@ -43,17 +47,13 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+        getFlags();
         setContentView(R.layout.activity_alarm_manager);
         alarm = new AlarmManagerBroadcastReceiver();
-        Log.d("dvm", "on create");
         setDeviceManager();
 //        checkCurfew();
     }
+
 
     private void setDeviceManager() {
         DeviceManagerSingleton.getInstance().getAlarmDeviceManager(this);
@@ -62,13 +62,12 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        Log.d("dvm", "has focus: " + hasFocus);
+        Log.d("relaunch", "has focus: " + hasFocus);
         if (!hasFocus) {
-            if (deviceManager != null  && deviceManager.isActiveAdmin()) {
-
-                Log.d("dvm", "has focus: " + hasFocus);
-//                relaunch();
-            }
+//            Log.d("relaunch", "is device locked: " + hasFocus);
+//            if (PrefsHelper.getBoolean(this, LOCK_DEVICE)) {
+//                alarm.relaunch(this);
+//            }
 //            sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
 
 //            sendBroadcast(new Intent(Intent.ACTION_LOCKED_BOOT_COMPLETED));
@@ -125,9 +124,11 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
 //            lockDevice();
 //        }
 
-        lockDevice();
+//        lockDevice();
 
 //        startDeviceManager();
+
+        finish();
     }
 
     private void relaunch() {
@@ -136,16 +137,39 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
+    private void getFlags() {
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        window.addFlags(WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Log.d("dvm", "new intent");
+        super.onNewIntent(intent);
+        getFlags();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("dvm", "pause");
+        Log.d("dvm", "onPause");
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.d("dvm", "stop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("dvm", "destroy");
     }
 
     //    @Override
@@ -195,10 +219,13 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
 //            Log.d("alarmor", "cancel alarm null");
 //            Toast.makeText(context, "Alarm is null", Toast.LENGTH_SHORT).show();
 //        }
-        if (isAppInLockTaskMode()) {
-            stopLockTask();
-        }
-        unlockDevice();
+
+//        if (isAppInLockTaskMode()) {
+//            stopLockTask();
+//        }
+//        unlockDevice();
+
+        alarm.cancelAlarm(this);
     }
 
     private AlarmDeviceManager deviceManager;
@@ -217,17 +244,28 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
                     Log.d("dvm", "result ok");
                 } else {
                 }
+                break;
+            case 101:
+                Log.d("dvm", "result: " + (resultCode == RESULT_OK));
+                break;
         }
     }
 
     private void lockDevice() {
         Log.d("dvm", "lock");
-        DeviceManagerSingleton.getInstance().lockScreen("1234");
+        PrefsHelper.setBoolean(this, LOCK_DEVICE, true);
+        DeviceManagerSingleton.getInstance().lockScreen(this, "1234");
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 2);
+        relaunch();
     }
+
+
 
     private void unlockDevice() {
         Log.d("dvm", "unlock");
-        DeviceManagerSingleton.getInstance().unLockScreen("1234");
+        PrefsHelper.setBoolean(this, LOCK_DEVICE, false);
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 15000);
+        DeviceManagerSingleton.getInstance().unLockScreen(this, "1234");
 //        if (deviceManager != null && deviceManager.isActiveAdmin()) {
 //            Log.d("dvm", "active admin unlock");
 //            deviceManager.unlockScreen("1234");
@@ -271,7 +309,19 @@ public class AlarmManagerActivity extends AppCompatActivity implements LoginTask
 //        }else{
 //            Toast.makeText(context, "Alarm is null", Toast.LENGTH_SHORT).show();
 //        }
+
+//        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 3000000);
+        alarm.checkActivities(this);
+        Intent intent = new Intent(Intent.ACTION_DIAL, null);
+        Log.d("foreground", "start call for result");
+        startActivityForResult(intent, 101);
+//        startActivityForResult(intent, 101);
+
     }
+
+    private UrlObserver observer = new UrlObserver(new Handler());
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.user.myalarm">
 
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -7,6 +8,11 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+
+    <uses-permission
+          android:name="android.permission.PACKAGE_USAGE_STATS"
+          tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -15,7 +21,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AlarmManagerActivity">
+        <activity android:name=".AlarmManagerActivity"
+            android:launchMode="singleTop"
+            android:showOnLockScreen="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,8 +32,7 @@
         </activity>
         <!-- Broadcast receiver -->
         <receiver
-            android:name=".AlarmManagerBroadcastReceiver"></receiver>
-
+            android:name=".AlarmManagerBroadcastReceiver"/>
         <service
             android:name=".services.CurfewService"
             android:exported="false"/>
